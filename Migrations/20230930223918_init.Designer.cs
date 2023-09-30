@@ -11,8 +11,8 @@ using quick_recipe.Data;
 namespace quick_recipe.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230930190808_default_updatedAt")]
-    partial class default_updatedAt
+    [Migration("20230930223918_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,13 +39,22 @@ namespace quick_recipe.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("MenuId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Menus");
                 });
 
             modelBuilder.Entity("quick_recipe.Models.Process", b =>
                 {
+                    b.Property<int>("ProcessId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Details")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -57,32 +66,49 @@ namespace quick_recipe.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ProcessId")
+                    b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("TimeInSeconds")
                         .HasColumnType("INTEGER");
+
+                    b.HasKey("ProcessId");
+
+                    b.HasIndex("RecipeId");
 
                     b.ToTable("Processes");
                 });
 
             modelBuilder.Entity("quick_recipe.Models.Recipe", b =>
                 {
+                    b.Property<int>("RecipeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("RecipeId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("TotalTimeInSeconds")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("RecipeId");
+
+                    b.HasIndex("MenuId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Recipes");
                 });
@@ -107,6 +133,10 @@ namespace quick_recipe.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
@@ -116,6 +146,64 @@ namespace quick_recipe.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("quick_recipe.Models.Menu", b =>
+                {
+                    b.HasOne("quick_recipe.Models.User", "User")
+                        .WithMany("Menus")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("quick_recipe.Models.Process", b =>
+                {
+                    b.HasOne("quick_recipe.Models.Recipe", "Recipe")
+                        .WithMany("Processes")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("quick_recipe.Models.Recipe", b =>
+                {
+                    b.HasOne("quick_recipe.Models.Menu", "Menu")
+                        .WithMany("Recipes")
+                        .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("quick_recipe.Models.User", "User")
+                        .WithMany("Recipes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Menu");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("quick_recipe.Models.Menu", b =>
+                {
+                    b.Navigation("Recipes");
+                });
+
+            modelBuilder.Entity("quick_recipe.Models.Recipe", b =>
+                {
+                    b.Navigation("Processes");
+                });
+
+            modelBuilder.Entity("quick_recipe.Models.User", b =>
+                {
+                    b.Navigation("Menus");
+
+                    b.Navigation("Recipes");
                 });
 #pragma warning restore 612, 618
         }

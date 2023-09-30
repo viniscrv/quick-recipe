@@ -1,16 +1,17 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace quick_recipe.Models;
 
-[Keyless]
 public class Process
 {
-    public int ProcessId { get; set; }
+    [Key] public int ProcessId { get; set; }
     [Required] public string Name { get; set; } = string.Empty;
-
     public string Details { get; set; } = string.Empty;
     public int Order { get; set; }
+    // multiply for 60 to convert in minutes
     public int TimeInSeconds { get; set; }
-    [Required] public List<string> Ingredients { get; set; } = new List<string>();
+    [NotMapped][Required] public List<string> Ingredients { get; set; } = new List<string>();
+    [ForeignKey("RecipeId")] public int RecipeId { get; set; }
+    public Recipe? Recipe { get; set; }
 }

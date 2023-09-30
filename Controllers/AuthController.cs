@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using quick_recipe.Data;
-using quick_recipe.DTOS;
+using quick_recipe.DTOs;
 using quick_recipe.Models;
 using quick_recipe.Services;
 

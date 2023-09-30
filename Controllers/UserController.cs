@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using quick_recipe.Data;
+using quick_recipe.Models;
 
 namespace quick_recipe.Controllers;
 
@@ -15,13 +16,22 @@ public class UserController : ControllerBase
     {
         _context = context;
     }
-    
+
     [HttpGet]
     [Authorize]
     [Route("me")]
     public IActionResult GetUser()
     {
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        return Ok(new {userEmail});
+
+        User? user = _context.Users.FirstOrDefault(user => user.Email == userEmail);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+
+        return Ok(new { user });
     }
 }
