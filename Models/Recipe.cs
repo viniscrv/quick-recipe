@@ -13,5 +13,5 @@ public class Recipe
     public int TotalTimeInSeconds { get; set; }
     public List<string>? Ingredients { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; } = DateTime.Now;
 }
