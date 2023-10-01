@@ -17,12 +17,15 @@ public class UserController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("/me")]
+    [HttpGet("me")]
     [Authorize]
     public async Task<IActionResult> GetUser()
     {
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
+        var user = await _context.Users
+            .Include(u => u.Menus)
+            .Include(u => u.Recipes)
+            .FirstOrDefaultAsync(u => u.Email == userEmail);
 
         if (user == null)
         {

@@ -36,7 +36,6 @@ public class MenuController : ControllerBase
             Name = menuDto.Name,
             Description = menuDto.Description,
             UserId = user.Id,
-            User = user
         };
 
         await _context.Menus.AddAsync(menu);
@@ -72,6 +71,7 @@ public class MenuController : ControllerBase
 
         menu.Name = menuDto.Name;
         menu.Description = menuDto.Description;
+        menu.UpdatedAt = DateTime.Now;
 
         _context.Menus.Update(menu);
         await _context.SaveChangesAsync();

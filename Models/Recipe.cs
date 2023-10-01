@@ -14,7 +14,7 @@ public class Recipe
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     public int UserId { get; set; }
     public User User { get; set; } = null!;
-    public int MenuId { get; set; }
-    public Menu Menu { get; set; } = null!;
+    public int? MenuId { get; set; }
+    public Menu? Menu { get; set; }
     public ICollection<Process> Processes { get; } = new List<Process>();
 }
