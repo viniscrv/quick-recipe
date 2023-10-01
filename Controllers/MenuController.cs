@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using quick_recipe.Data;
 using quick_recipe.DTOs;
 using quick_recipe.Models;
@@ -18,37 +19,45 @@ public class MenuController : ControllerBase
         _context = context;
     }
 
+    [HttpGet("/{id}")]
+    [Authorize]
+    public IActionResult GetMenu([FromRoute] int id)
+    {
+
+        var menu = _context.Menus.FirstOrDefault(m => m.Id == id);
+
+        if (menu == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(menu);
+    }
+
     [HttpPost]
     [Authorize]
-    public IActionResult Create([FromBody] MenuDTO menuDto)
+    public async Task<IActionResult> Create([FromBody] MenuDTO menuDto)
     {
 
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
 
         if (user == null)
         {
             return NotFound();
         }
 
-        var menu = new Menu
+        Menu menu = new()
         {
             Name = menuDto.Name,
             Description = menuDto.Description,
             UserId = user.Id,
+            User = user
         };
 
-        user.Menus.Add(menu);
+        await _context.Menus.AddAsync(menu);
+        await _context.SaveChangesAsync();
 
-        _context.Menus.Add(menu);
-        _context.SaveChanges();
-
-        return Created(nameof(Create), new { message = "Criado com sucesso" });
+        return Created(nameof(Create), new { menu });
     }
-    // var jsonSerializerOptions = new JsonSerializerOptions
-    // {
-    //     ReferenceHandler = ReferenceHandler.Preserve,
-    // };
-
-    // var jsonMenu = JsonSerializer.Serialize(menu, jsonSerializerOptions);
 }

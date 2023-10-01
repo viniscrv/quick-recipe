@@ -9,10 +9,10 @@ public class ApplicationContext : DbContext
     {
     }
 
-    public DbSet<User> Users { get; set; }
-    public DbSet<Menu> Menus { get; set; }
-    public DbSet<Recipe> Recipes { get; set; }
-    public DbSet<Process> Processes { get; set; }
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Menu> Menus { get; set; } = null!;
+    public DbSet<Recipe> Recipes { get; set; } = null!;
+    public DbSet<Process> Processes { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -20,7 +20,7 @@ public class ApplicationContext : DbContext
 
         // modelBuilder.Entity<User>(entity =>
         // {
-        //     entity.HasKey(u => u.UserId);
+        //     entity.HasKey(u => u.Id);
 
         //     entity.HasMany(u => u.Recipes)
         //         .WithOne(r => r.User)
@@ -33,7 +33,7 @@ public class ApplicationContext : DbContext
 
         // modelBuilder.Entity<Menu>(entity =>
         // {
-        //     entity.HasKey(m => m.MenuId);
+        //     entity.HasKey(m => m.Id);
 
         //     entity.HasOne(m => m.User)
         //         .WithMany(u => u.Menus)
@@ -46,7 +46,7 @@ public class ApplicationContext : DbContext
 
         // modelBuilder.Entity<Recipe>(entity =>
         // {
-        //     entity.HasKey(r => r.RecipeId);
+        //     entity.HasKey(r => r.Id);
 
         //     entity.HasOne(r => r.User)
         //         .WithMany(u => u.Recipes)
@@ -63,7 +63,7 @@ public class ApplicationContext : DbContext
 
         // modelBuilder.Entity<Process>(entity =>
         // {
-        //     entity.HasKey(p => p.ProcessId);
+        //     entity.HasKey(p => p.Id);
 
         //     entity.HasOne(p => p.Recipe)
         //         .WithMany(r => r.Processes)

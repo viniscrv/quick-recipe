@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using quick_recipe.Data;
-using quick_recipe.Models;
 
 namespace quick_recipe.Controllers;
 
@@ -18,20 +17,18 @@ public class UserController : ControllerBase
         _context = context;
     }
 
-    [HttpGet]
+    [HttpGet("/me")]
     [Authorize]
-    [Route("me")]
-    public IActionResult GetUser()
+    public async Task<IActionResult> GetUser()
     {
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
+        var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
 
         if (user == null)
         {
             return NotFound();
         }
 
-
-        return Ok(new { user });
+        return Ok(user);
     }
 }

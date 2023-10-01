@@ -11,8 +11,8 @@ using quick_recipe.Data;
 namespace quick_recipe.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20231001021625_test")]
-    partial class test
+    [Migration("20231001175855_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

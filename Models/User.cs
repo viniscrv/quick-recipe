@@ -12,6 +12,6 @@ public class User
     public string? Biography { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
-    public List<Menu> Menus { get; } = new List<Menu>();
-    public List<Recipe> Recipes { get; } = new List<Recipe>();
+    public ICollection<Menu> Menus { get; } = new List<Menu>();
+    public ICollection<Recipe> Recipes { get; } = new List<Recipe>();
 }

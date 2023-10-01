@@ -10,5 +10,5 @@ public class Menu
     public DateTime? UpdatedAt { get; set; } = DateTime.Now;
     public int UserId { get; set; }
     public User User { get; set; } = null!;
-    public List<Recipe> Recipes { get; } = new List<Recipe>();
+    public ICollection<Recipe> Recipes { get; } = new List<Recipe>();
 }
