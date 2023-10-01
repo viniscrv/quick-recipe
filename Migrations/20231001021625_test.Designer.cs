@@ -11,8 +11,8 @@ using quick_recipe.Data;
 namespace quick_recipe.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230930223918_init")]
-    partial class init
+    [Migration("20231001021625_test")]
+    partial class test
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,7 @@ namespace quick_recipe.Migrations
 
             modelBuilder.Entity("quick_recipe.Models.Menu", b =>
                 {
-                    b.Property<int>("MenuId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -42,7 +42,7 @@ namespace quick_recipe.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("MenuId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 
@@ -51,7 +51,7 @@ namespace quick_recipe.Migrations
 
             modelBuilder.Entity("quick_recipe.Models.Process", b =>
                 {
-                    b.Property<int>("ProcessId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -72,7 +72,7 @@ namespace quick_recipe.Migrations
                     b.Property<int>("TimeInSeconds")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("ProcessId");
+                    b.HasKey("Id");
 
                     b.HasIndex("RecipeId");
 
@@ -81,7 +81,7 @@ namespace quick_recipe.Migrations
 
             modelBuilder.Entity("quick_recipe.Models.Recipe", b =>
                 {
-                    b.Property<int>("RecipeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -98,13 +98,13 @@ namespace quick_recipe.Migrations
                     b.Property<int>("TotalTimeInSeconds")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("RecipeId");
+                    b.HasKey("Id");
 
                     b.HasIndex("MenuId");
 
@@ -115,7 +115,7 @@ namespace quick_recipe.Migrations
 
             modelBuilder.Entity("quick_recipe.Models.User", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -137,10 +137,10 @@ namespace quick_recipe.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("UpdatedAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();

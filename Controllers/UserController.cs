@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using quick_recipe.Data;
 using quick_recipe.Models;
 
@@ -23,8 +24,7 @@ public class UserController : ControllerBase
     public IActionResult GetUser()
     {
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
-
-        User? user = _context.Users.FirstOrDefault(user => user.Email == userEmail);
+        var user = _context.Users.FirstOrDefault(u => u.Email == userEmail);
 
         if (user == null)
         {
