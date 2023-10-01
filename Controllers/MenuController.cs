@@ -58,6 +58,26 @@ public class MenuController : ControllerBase
 
         return Ok(menu);
     }
+    
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Put([FromRoute] int id, [FromBody] MenuDTO menuDto)
+    {
+        var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
+
+        if (menu == null)
+        {
+            return NotFound();
+        }
+
+        menu.Name = menuDto.Name;
+        menu.Description = menuDto.Description;
+
+        _context.Menus.Update(menu);
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
 
     [HttpDelete("{id}")]
     [Authorize]
