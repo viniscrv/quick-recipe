@@ -19,26 +19,10 @@ public class MenuController : ControllerBase
         _context = context;
     }
 
-    [HttpGet("/{id}")]
-    [Authorize]
-    public IActionResult GetMenu([FromRoute] int id)
-    {
-
-        var menu = _context.Menus.FirstOrDefault(m => m.Id == id);
-
-        if (menu == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(menu);
-    }
-
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> Create([FromBody] MenuDTO menuDto)
     {
-
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
 
@@ -58,6 +42,59 @@ public class MenuController : ControllerBase
         await _context.Menus.AddAsync(menu);
         await _context.SaveChangesAsync();
 
-        return Created(nameof(Create), new { menu });
+        return Created(nameof(Create), menu);
+    }
+
+    [HttpGet("{id}")]
+    [Authorize]
+    public IActionResult Get([FromRoute] int id)
+    {
+        var menu = _context.Menus.FirstOrDefault(m => m.Id == id);
+
+        if (menu == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(menu);
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Remove([FromRoute] int id)
+    {
+        var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
+
+        if (menu == null)
+        {
+            return NotFound();
+        }
+
+        _context.Menus.Remove(menu);
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
+
+    [HttpDelete("remove-all")]
+    [Authorize]
+    public async Task<IActionResult> RemoveAll()
+    {
+        var userEmail = User.FindFirstValue(ClaimTypes.Email);
+        var user = await _context.Users.Include(user => user.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
+
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        foreach (Menu menu in user.Menus.ToList())
+        {
+            _context.Menus.Remove(menu);
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
     }
 }
