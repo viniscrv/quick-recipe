@@ -45,4 +45,20 @@ public class RecipeController : ControllerBase
 
         return Created(nameof(Create), recipe);
     }
+
+    [HttpGet("{id}")]
+    [Authorize]
+    public IActionResult Get([FromRoute] int id)
+    {
+        var recipe = _context.Recipes
+            .Include(r => r.Ingredients)
+            .FirstOrDefault(r => r.Id == id);
+
+        if (recipe == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(recipe);
+    }
 }
