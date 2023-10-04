@@ -60,7 +60,7 @@ public class MenuController : ControllerBase
     
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<IActionResult> Put([FromRoute] int id, [FromBody] MenuDTO menuDto)
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] MenuDTO menuDto)
     {
         var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
 
@@ -81,7 +81,7 @@ public class MenuController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize]
-    public async Task<IActionResult> Remove([FromRoute] int id)
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
 

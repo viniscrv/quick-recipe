@@ -61,4 +61,42 @@ public class RecipeController : ControllerBase
 
         return Ok(recipe);
     }
+    
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] RecipeDTO recipeDto)
+    {
+        var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
+
+        if (recipe == null)
+        {
+            return NotFound();
+        }
+
+        recipe.Name = recipeDto.Name;
+        recipe.Ingredients = recipeDto.Ingredients;
+        recipe.UpdatedAt = DateTime.Now;
+
+        _context.Recipes.Update(recipe);
+        await _context.SaveChangesAsync();
+
+        return Ok();
+    }
+    
+    [HttpDelete("{id}")]
+    [Authorize]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
+
+        if (recipe == null)
+        {
+            return NotFound();
+        }
+
+        _context.Recipes.Remove(recipe);
+        await _context.SaveChangesAsync();
+        
+        return Ok();
+    }
 }

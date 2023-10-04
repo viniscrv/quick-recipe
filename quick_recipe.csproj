@@ -21,5 +21,18 @@
     <ItemGroup>
       <Compile Remove="Controllers\WeatherForecastController.cs" />
       <Compile Remove="Controllers\ProcessController.cs" />
+      <Compile Remove="Repositories\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Repositories\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Repositories\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Repositories\**" />
     </ItemGroup>
 </Project>
