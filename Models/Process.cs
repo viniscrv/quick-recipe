@@ -9,8 +9,7 @@ public class Process
     public string Details { get; set; } = string.Empty;
     public int Order { get; set; }
     // multiply for 60 to convert in minutes
-    public int TimeInSeconds { get; set; }
-    [NotMapped] public List<string> Ingredients { get; set; } = new List<string>();
+    public int TimeInSeconds { get; set; } = 0;
     public int RecipeId { get; set; }
     public Recipe Recipe { get; set; } = null!;
 }

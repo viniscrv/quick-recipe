@@ -7,5 +7,6 @@ public class RecipeDTO
 {
     [Required] public string Name { get; set; } = null!;
     public List<Ingredient>? Ingredients { get; set; }
+    public ICollection<ProcessDTO>? Processes { get; set; }
     public int? MenuId { get; set; }
 }

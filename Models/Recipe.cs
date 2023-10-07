@@ -16,7 +16,7 @@ public class Recipe
     public User User { get; set; } = null!;
     public int? MenuId { get; set; }
     public Menu? Menu { get; set; }
-    public ICollection<Process> Processes { get; } = new List<Process>();
+    public ICollection<Process> Processes { get; set; } = new List<Process>();
 }
 
 public class Ingredient

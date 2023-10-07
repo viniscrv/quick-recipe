@@ -37,6 +37,24 @@ public class RecipeController : ControllerBase
             MenuId = recipeDto.MenuId
         };
 
+        if (recipeDto.Processes != null)
+        {
+            var processes = recipeDto.Processes.Select(processDto =>
+            {
+                var process = new Process
+                {
+                    Name = processDto.Name!,
+                    Details = processDto.Details!,
+                    TimeInSeconds = processDto.TimeInSeconds,
+                    Order = processDto.Order,
+                    RecipeId = recipe.Id
+                };
+                return process;
+            }).ToList();
+            
+            recipe.Processes = processes;
+        }
+
         await _context.Recipes.AddAsync(recipe);
         await _context.SaveChangesAsync();
 
@@ -49,16 +67,14 @@ public class RecipeController : ControllerBase
     {
         var recipe = _context.Recipes
             .Include(r => r.Ingredients)
+            .Include(r => r.Processes)
             .FirstOrDefault(r => r.Id == id);
 
-        if (recipe == null)
-        {
-            return NotFound();
-        }
+        if (recipe == null) return NotFound();
 
         return Ok(recipe);
     }
-    
+
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] RecipeDTO recipeDto)
@@ -76,7 +92,7 @@ public class RecipeController : ControllerBase
 
         return Ok();
     }
-    
+
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> Delete([FromRoute] int id)
@@ -87,7 +103,7 @@ public class RecipeController : ControllerBase
 
         _context.Recipes.Remove(recipe);
         await _context.SaveChangesAsync();
-        
+
         return Ok();
     }
 }

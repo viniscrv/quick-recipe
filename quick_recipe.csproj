@@ -22,6 +22,7 @@
       <Compile Remove="Controllers\WeatherForecastController.cs" />
       <Compile Remove="Controllers\ProcessController.cs" />
       <Compile Remove="Repositories\**" />
+      <Compile Remove="Controllers\StartRecipeController.cs" />
     </ItemGroup>
 
     <ItemGroup>

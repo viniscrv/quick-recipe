@@ -52,6 +52,6 @@ public class AuthController : ControllerBase
 
         var token = _tokenService.Generate(user);
         
-        return Ok(token);
+        return Ok(new { token = token });
     }
 }
