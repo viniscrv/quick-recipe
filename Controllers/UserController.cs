@@ -25,12 +25,10 @@ public class UserController : ControllerBase
         var user = await _context.Users
             .Include(u => u.Menus)
             .Include(u => u.Recipes)
+            .Include(u => u.RecipeInProgress)
             .FirstOrDefaultAsync(u => u.Email == userEmail);
 
-        if (user == null)
-        {
-            return NotFound();
-        }
+        if (user == null) return NotFound();
 
         return Ok(user);
     }

@@ -26,10 +26,7 @@ public class RecipeController : ControllerBase
         var userEmail = User.FindFirstValue(ClaimTypes.Email);
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
 
-        if (user == null)
-        {
-            return NotFound();
-        }
+        if (user == null) return NotFound();
 
         Recipe recipe = new()
         {
@@ -68,10 +65,7 @@ public class RecipeController : ControllerBase
     {
         var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
 
-        if (recipe == null)
-        {
-            return NotFound();
-        }
+        if (recipe == null) return NotFound();
 
         recipe.Name = recipeDto.Name;
         recipe.Ingredients = recipeDto.Ingredients;
@@ -89,10 +83,7 @@ public class RecipeController : ControllerBase
     {
         var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
 
-        if (recipe == null)
-        {
-            return NotFound();
-        }
+        if (recipe == null) return NotFound();
 
         _context.Recipes.Remove(recipe);
         await _context.SaveChangesAsync();

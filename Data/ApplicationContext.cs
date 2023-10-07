@@ -10,6 +10,7 @@ public class ApplicationContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<RecipeInProgress> RecipeInProgresses { get; set; } = null!;
     public DbSet<Menu> Menus { get; set; } = null!;
     public DbSet<Recipe> Recipes { get; set; } = null!;
     public DbSet<Process> Processes { get; set; } = null!;

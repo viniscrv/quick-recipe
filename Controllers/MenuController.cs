@@ -48,12 +48,12 @@ public class MenuController : ControllerBase
     [Authorize]
     public IActionResult Get([FromRoute] int id)
     {
-        var menu = _context.Menus.FirstOrDefault(m => m.Id == id);
+        var menu = _context
+            .Menus
+            .Include(m => m.User)
+            .FirstOrDefault(m => m.Id == id);
 
-        if (menu == null)
-        {
-            return NotFound();
-        }
+        if (menu == null) return NotFound();
 
         return Ok(menu);
     }

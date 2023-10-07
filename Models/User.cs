@@ -14,4 +14,5 @@ public class User
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     public ICollection<Menu> Menus { get; } = new List<Menu>();
     public ICollection<Recipe> Recipes { get; } = new List<Recipe>();
+    public RecipeInProgress? RecipeInProgress { get; set; }
 }
