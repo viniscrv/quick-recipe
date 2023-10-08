@@ -39,19 +39,25 @@ public class RecipeController : ControllerBase
 
         if (recipeDto.Processes != null)
         {
-            var processes = recipeDto.Processes.Select(processDto =>
+            int order = 1;
+            // Boolean previousIsSequential = false;
+
+            var processes = recipeDto.Processes.Select((processDto, index) =>
             {
+                if (index != 0 && processDto.isSequential) order += 1;
+                
                 var process = new Process
                 {
                     Name = processDto.Name!,
                     Details = processDto.Details!,
                     TimeInSeconds = processDto.TimeInSeconds,
-                    Order = processDto.Order,
-                    RecipeId = recipe.Id
+                    Order = order,
+                    RecipeId = recipe.Id,
                 };
+
                 return process;
             }).ToList();
-            
+
             recipe.Processes = processes;
         }
 

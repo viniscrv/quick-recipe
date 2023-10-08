@@ -74,6 +74,7 @@ public class RecipeInProgressController : ControllerBase
                 p.Details,
                 p.Order,
                 p.TimeInSeconds,
+                timeToFinish = DateTime.Now.AddSeconds(p.TimeInSeconds),
             });
 
         return Ok(currentProcess);
@@ -113,7 +114,7 @@ public class RecipeInProgressController : ControllerBase
 
         _context.RecipeInProgresses.Update(user.RecipeInProgress);
         await _context.SaveChangesAsync();
-        
+
         var currentProcess = recipe.Processes
             .Where(p => p.Order == user.RecipeInProgress.CurrentStep)
             .Select(p => new
@@ -122,11 +123,12 @@ public class RecipeInProgressController : ControllerBase
                 p.Details,
                 p.Order,
                 p.TimeInSeconds,
+                timeToFinish = DateTime.Now.AddSeconds(p.TimeInSeconds),
             });
 
         return Ok(currentProcess);
     }
-    
+
     [HttpGet("back-step")]
     [Authorize]
     public async Task<IActionResult> backStep()
@@ -143,13 +145,14 @@ public class RecipeInProgressController : ControllerBase
 
         if (recipe == null) return NotFound(new { errorMessage = "Recipe not founded" });
 
-        if (user.RecipeInProgress.CurrentStep == 1) return BadRequest(new { errorMessage = "You are already in the first step" });
+        if (user.RecipeInProgress.CurrentStep == 1)
+            return BadRequest(new { errorMessage = "You are already in the first step" });
 
         user.RecipeInProgress.CurrentStep -= 1;
-        
+
         _context.RecipeInProgresses.Update(user.RecipeInProgress);
         await _context.SaveChangesAsync();
-        
+
         var currentProcess = recipe.Processes
             .Where(p => p.Order == user.RecipeInProgress.CurrentStep)
             .Select(p => new
@@ -158,11 +161,12 @@ public class RecipeInProgressController : ControllerBase
                 p.Details,
                 p.Order,
                 p.TimeInSeconds,
+                timeToFinish = DateTime.Now.AddSeconds(p.TimeInSeconds),
             });
 
         return Ok(currentProcess);
     }
-    
+
     [HttpPost("finish-recipe")]
     [Authorize]
     public async Task<IActionResult> finishRecipe()
