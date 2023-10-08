@@ -75,6 +75,9 @@ namespace quick_recipe.Controllers
                 return Forbid(); // Usuario nao tem permissao para deletar este menu
             }
 
+            // Desvincular todas as receitas do menu
+            menu.Recipes.Clear();
+
             _context.Menus.Remove(menu);
             await _context.SaveChangesAsync();
 

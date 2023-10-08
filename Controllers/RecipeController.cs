@@ -67,7 +67,7 @@ namespace quick_recipe.Controllers
                 return NotFound();
             }
 
-            var recipe = await _context.Recipes.FindAsync(id);
+            var recipe = await _context.Recipes.Include(r => r.Ingredients).Include(r => r.Processes).FirstOrDefaultAsync(r => r.Id == id);
 
             if (recipe == null)
             {
@@ -76,13 +76,22 @@ namespace quick_recipe.Controllers
 
             if (recipe.UserId != user.Id)
             {
-                return Forbid(); // Usuario nao esta permitido para deletar 
+                return Forbid(); // Usuário não está autorizado a excluir esta receita
             }
+
+            // Remover ingredientes associados à receita
+            if (recipe.Ingredients != null)
+            {
+                _context.Ingredients.RemoveRange(recipe.Ingredients);
+            }
+            // Remover processos associados à receita
+            _context.Processes.RemoveRange(recipe.Processes);
 
             _context.Recipes.Remove(recipe);
             await _context.SaveChangesAsync();
 
             return Ok();
         }
+
     }
 }
