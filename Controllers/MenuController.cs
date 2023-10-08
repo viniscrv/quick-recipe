@@ -19,7 +19,44 @@ namespace quick_recipe.Controllers
             _context = context;
         }
 
-        // ... [HttpPost], [HttpGet], [HttpPut], [HttpDelete], [HttpDelete("remove-all")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Create([FromBody] MenuDTO menuDto)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            Menu menu = new()
+            {
+                Name = menuDto.Name,
+                Description = menuDto.Description,
+                UserId = user.Id,
+            };
+
+            await _context.Menus.AddAsync(menu);
+            await _context.SaveChangesAsync();
+
+            return Created(nameof(Create), menu);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public IActionResult Get([FromRoute] int id)
+        {
+            var menu = _context
+                .Menus
+                .Include(m => m.Recipes)
+                .FirstOrDefault(m => m.Id == id);
+
+            if (menu == null) return NotFound();
+
+            return Ok(menu);
+        }
 
         [HttpPut("{id}")]
         [Authorize]
@@ -35,15 +72,9 @@ namespace quick_recipe.Controllers
 
             var menu = await _context.Menus.FindAsync(id);
 
-            if (menu == null)
-            {
-                return NotFound();
-            }
+            if (menu == null) return NotFound();
+            if (menu.UserId != user.Id) return Forbid();
 
-            if (menu.UserId != user.Id)
-            {
-                return Forbid(); // Usuario nao tem permissao para atualizar esse menu
-            }
             menu.Name = menuDto.Name;
             menu.Description = menuDto.Description;
             menu.UpdatedAt = DateTime.Now;
@@ -53,6 +84,7 @@ namespace quick_recipe.Controllers
 
             return Ok();
         }
+
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> Delete([FromRoute] int id)
@@ -70,12 +102,9 @@ namespace quick_recipe.Controllers
             {
                 return NotFound();
             }
-            if (menu.UserId != user.Id)
-            {
-                return Forbid(); // Usuario nao tem permissao para deletar este menu
-            }
 
-            // Desvincular todas as receitas do menu
+            if (menu.UserId != user.Id) return Forbid();
+
             menu.Recipes.Clear();
 
             _context.Menus.Remove(menu);
@@ -83,20 +112,20 @@ namespace quick_recipe.Controllers
 
             return Ok();
         }
+
         [HttpDelete("remove-all")]
         [Authorize]
         public async Task<IActionResult> RemoveAll()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
+
             foreach (var menu in user.Menus)
             {
                 _context.Menus.Remove(menu);
             }
+
             await _context.SaveChangesAsync();
             return Ok();
         }

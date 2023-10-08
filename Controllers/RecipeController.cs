@@ -19,6 +19,67 @@ namespace quick_recipe.Controllers
             _context = context;
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Create([FromBody] RecipeDTO recipeDto)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (user == null) return NotFound();
+
+            Recipe recipe = new()
+            {
+                Name = recipeDto.Name,
+                TotalTimeInSeconds = 0,
+                Ingredients = recipeDto.Ingredients,
+                UserId = user.Id,
+                MenuId = recipeDto.MenuId
+            };
+
+            if (recipeDto.Processes != null)
+            {
+                int order = 1;
+                // Boolean previousIsSequential = false;
+
+                var processes = recipeDto.Processes.Select((processDto, index) =>
+                {
+                    if (index != 0 && processDto.isSequential) order += 1;
+
+                    var process = new Process
+                    {
+                        Name = processDto.Name!,
+                        Details = processDto.Details!,
+                        TimeInSeconds = processDto.TimeInSeconds,
+                        Order = order,
+                        RecipeId = recipe.Id,
+                    };
+
+                    return process;
+                }).ToList();
+
+                recipe.Processes = processes;
+            }
+
+            await _context.Recipes.AddAsync(recipe);
+            await _context.SaveChangesAsync();
+
+            return Created(nameof(Create), recipe);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public IActionResult Get([FromRoute] int id)
+        {
+            var recipe = _context.Recipes
+                .Include(r => r.Ingredients)
+                .Include(r => r.Processes)
+                .FirstOrDefault(r => r.Id == id);
+
+            if (recipe == null) return NotFound();
+
+            return Ok(recipe);
+        }
+
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] RecipeDTO recipeDto)
@@ -31,7 +92,6 @@ namespace quick_recipe.Controllers
             var recipe = await _context.Recipes.FindAsync(id);
 
             if (recipe == null) return NotFound();
-
             if (recipe.UserId != user.Id) return Forbid();
 
             recipe.Name = recipeDto.Name;
@@ -56,7 +116,8 @@ namespace quick_recipe.Controllers
                 return NotFound();
             }
 
-            var recipe = await _context.Recipes.Include(r => r.Ingredients).Include(r => r.Processes).FirstOrDefaultAsync(r => r.Id == id);
+            var recipe = await _context.Recipes.Include(r => r.Ingredients).Include(r => r.Processes)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (recipe == null)
             {
@@ -69,10 +130,11 @@ namespace quick_recipe.Controllers
             }
 
             // Remover ingredientes associados à receita
-            if (recipe.Ingredients != null)
-            {
-                _context.Ingredients.RemoveRange(recipe.Ingredients);
-            }
+            // if (recipe.Ingredients != null)
+            // {
+            //     _context.Ingredients.RemoveRange(recipe.Ingredients);
+            // }
+
             // Remover processos associados à receita
             _context.Processes.RemoveRange(recipe.Processes);
 
@@ -81,6 +143,5 @@ namespace quick_recipe.Controllers
 
             return Ok();
         }
-
     }
 }
