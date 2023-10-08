@@ -23,17 +23,21 @@
       <Compile Remove="Controllers\ProcessController.cs" />
       <Compile Remove="Repositories\**" />
       <Compile Remove="Controllers\StartRecipeController.cs" />
+      <Compile Remove="Utils\**" />
     </ItemGroup>
 
     <ItemGroup>
       <EmbeddedResource Remove="Repositories\**" />
+      <EmbeddedResource Remove="Utils\**" />
     </ItemGroup>
 
     <ItemGroup>
       <Content Remove="Repositories\**" />
+      <Content Remove="Utils\**" />
     </ItemGroup>
 
     <ItemGroup>
       <None Remove="Repositories\**" />
+      <None Remove="Utils\**" />
     </ItemGroup>
 </Project>
