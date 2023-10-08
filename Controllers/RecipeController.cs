@@ -110,34 +110,17 @@ namespace quick_recipe.Controllers
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = await _context.Users.Include(u => u.Recipes).FirstOrDefaultAsync(u => u.Email == userEmail);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
             var recipe = await _context.Recipes.Include(r => r.Ingredients).Include(r => r.Processes)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
-            if (recipe == null)
-            {
-                return NotFound();
-            }
+            if (recipe == null) return NotFound();
+            if (recipe.UserId != user.Id) return Forbid(); 
 
-            if (recipe.UserId != user.Id)
-            {
-                return Forbid(); // Usuário não está autorizado a excluir esta receita
-            }
+            if (recipe.Ingredients != null) recipe.Ingredients.Clear();
 
-            // Remover ingredientes associados à receita
-            // if (recipe.Ingredients != null)
-            // {
-            //     _context.Ingredients.RemoveRange(recipe.Ingredients);
-            // }
-
-            // Remover processos associados à receita
             _context.Processes.RemoveRange(recipe.Processes);
-
             _context.Recipes.Remove(recipe);
             await _context.SaveChangesAsync();
 

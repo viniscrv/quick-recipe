@@ -64,13 +64,9 @@ namespace quick_recipe.Controllers
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (user == null) return NotFound();
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            var menu = await _context.Menus.FindAsync(id);
+            var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
 
             if (menu == null) return NotFound();
             if (menu.UserId != user.Id) return Forbid();
@@ -92,17 +88,10 @@ namespace quick_recipe.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
-            var menu = await _context.Menus.FindAsync(id);
-            if (menu == null)
-            {
-                return NotFound();
-            }
-
+            var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
+            if (menu == null) return NotFound();
             if (menu.UserId != user.Id) return Forbid();
 
             menu.Recipes.Clear();
@@ -118,11 +107,14 @@ namespace quick_recipe.Controllers
         public async Task<IActionResult> RemoveAll()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
             if (user == null) return NotFound();
 
-            foreach (var menu in user.Menus)
+            var menus = _context.Menus.Include(m => m.Recipes).Where(m => m.UserId == user.Id);
+            
+            foreach (var menu in menus)
             {
+                menu.Recipes.Clear();
                 _context.Menus.Remove(menu);
             }
 
