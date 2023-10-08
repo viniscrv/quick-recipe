@@ -14,8 +14,8 @@ public class ApplicationContext : DbContext
     public DbSet<Menu> Menus { get; set; } = null!;
     public DbSet<Recipe> Recipes { get; set; } = null!;
     public DbSet<Process> Processes { get; set; } = null!;
+    public DbSet<Ingredient> Ingredients { get; set; } = null!;
 
-     public DbSet<Ingredient> Ingredients { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

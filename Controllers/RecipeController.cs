@@ -19,8 +19,6 @@ namespace quick_recipe.Controllers
             _context = context;
         }
 
-        // ... [HttpPost], [HttpGet], [HttpPut], [HttpDelete]
-
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] RecipeDTO recipeDto)
@@ -28,22 +26,13 @@ namespace quick_recipe.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = await _context.Users.Include(u => u.Recipes).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
             var recipe = await _context.Recipes.FindAsync(id);
 
-            if (recipe == null)
-            {
-                return NotFound();
-            }
+            if (recipe == null) return NotFound();
 
-            if (recipe.UserId != user.Id)
-            {
-                return Forbid(); // Usuario nao permitido para atualizar
-            }
+            if (recipe.UserId != user.Id) return Forbid();
 
             recipe.Name = recipeDto.Name;
             recipe.Ingredients = recipeDto.Ingredients;
