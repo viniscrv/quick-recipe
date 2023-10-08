@@ -6,115 +6,96 @@ using quick_recipe.Data;
 using quick_recipe.DTOs;
 using quick_recipe.Models;
 
-namespace quick_recipe.Controllers;
-
-[ApiController]
-[Route("/menu")]
-public class MenuController : ControllerBase
+namespace quick_recipe.Controllers
 {
-    private readonly ApplicationContext _context;
-
-    public MenuController(ApplicationContext context)
+    [ApiController]
+    [Route("/menu")]
+    public class MenuController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly ApplicationContext _context;
 
-    [HttpPost]
-    [Authorize]
-    public async Task<IActionResult> Create([FromBody] MenuDTO menuDto)
-    {
-        var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-
-        if (user == null)
+        public MenuController(ApplicationContext context)
         {
-            return NotFound();
+            _context = context;
         }
 
-        Menu menu = new()
+        // ... [HttpPost], [HttpGet], [HttpPut], [HttpDelete], [HttpDelete("remove-all")]
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] MenuDTO menuDto)
         {
-            Name = menuDto.Name,
-            Description = menuDto.Description,
-            UserId = user.Id,
-        };
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-        await _context.Menus.AddAsync(menu);
-        await _context.SaveChangesAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        return Created(nameof(Create), menu);
-    }
+            var menu = await _context.Menus.FindAsync(id);
 
-    [HttpGet("{id}")]
-    [Authorize]
-    public IActionResult Get([FromRoute] int id)
-    {
-        var menu = _context
-            .Menus
-            .Include(m => m.User)
-            .FirstOrDefault(m => m.Id == id);
+            if (menu == null)
+            {
+                return NotFound();
+            }
 
-        if (menu == null) return NotFound();
+            if (menu.UserId != user.Id)
+            {
+                return Forbid(); // Usuario nao tem permissao para atualizar esse menu
+            }
+            menu.Name = menuDto.Name;
+            menu.Description = menuDto.Description;
+            menu.UpdatedAt = DateTime.Now;
 
-        return Ok(menu);
-    }
-    
-    [HttpPut("{id}")]
-    [Authorize]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] MenuDTO menuDto)
-    {
-        var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
+            _context.Menus.Update(menu);
+            await _context.SaveChangesAsync();
 
-        if (menu == null)
-        {
-            return NotFound();
+            return Ok();
         }
-
-        menu.Name = menuDto.Name;
-        menu.Description = menuDto.Description;
-        menu.UpdatedAt = DateTime.Now;
-
-        _context.Menus.Update(menu);
-        await _context.SaveChangesAsync();
-
-        return Ok();
-    }
-
-    [HttpDelete("{id}")]
-    [Authorize]
-    public async Task<IActionResult> Delete([FromRoute] int id)
-    {
-        var menu = await _context.Menus.FirstOrDefaultAsync(m => m.Id == id);
-
-        if (menu == null)
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
-            return NotFound();
-        }
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-        _context.Menus.Remove(menu);
-        await _context.SaveChangesAsync();
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        return Ok();
-    }
+            var menu = await _context.Menus.FindAsync(id);
+            if (menu == null)
+            {
+                return NotFound();
+            }
+            if (menu.UserId != user.Id)
+            {
+                return Forbid(); // Usuario nao tem permissao para deletar este menu
+            }
 
-    [HttpDelete("remove-all")]
-    [Authorize]
-    public async Task<IActionResult> RemoveAll()
-    {
-        var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        var user = await _context.Users.Include(user => user.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
-
-        if (user == null)
-        {
-            return NotFound();
-        }
-
-        foreach (Menu menu in user.Menus.ToList())
-        {
             _context.Menus.Remove(menu);
+            await _context.SaveChangesAsync();
+
+            return Ok();
         }
-
-        await _context.SaveChangesAsync();
-
-        return Ok();
+        [HttpDelete("remove-all")]
+        [Authorize]
+        public async Task<IActionResult> RemoveAll()
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _context.Users.Include(u => u.Menus).FirstOrDefaultAsync(u => u.Email == userEmail);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            foreach (var menu in user.Menus)
+            {
+                _context.Menus.Remove(menu);
+            }
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
     }
 }

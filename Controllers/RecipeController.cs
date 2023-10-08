@@ -1,115 +1,88 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using quick_recipe.Data;
 using quick_recipe.DTOs;
-using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
 using quick_recipe.Models;
 
-namespace quick_recipe.Controllers;
-
-[ApiController]
-[Route("/recipe")]
-public class RecipeController : ControllerBase
+namespace quick_recipe.Controllers
 {
-    private readonly ApplicationContext _context;
-
-    public RecipeController(ApplicationContext context)
+    [ApiController]
+    [Route("/recipe")]
+    public class RecipeController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly ApplicationContext _context;
 
-    [HttpPost]
-    [Authorize]
-    public async Task<IActionResult> Create([FromBody] RecipeDTO recipeDto)
-    {
-        var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userEmail);
-
-        if (user == null) return NotFound();
-
-        Recipe recipe = new()
+        public RecipeController(ApplicationContext context)
         {
-            Name = recipeDto.Name,
-            TotalTimeInSeconds = 0,
-            Ingredients = recipeDto.Ingredients,
-            UserId = user.Id,
-            MenuId = recipeDto.MenuId
-        };
-
-        if (recipeDto.Processes != null)
-        {
-            int order = 1;
-            // Boolean previousIsSequential = false;
-
-            var processes = recipeDto.Processes.Select((processDto, index) =>
-            {
-                if (index != 0 && processDto.isSequential) order += 1;
-                
-                var process = new Process
-                {
-                    Name = processDto.Name!,
-                    Details = processDto.Details!,
-                    TimeInSeconds = processDto.TimeInSeconds,
-                    Order = order,
-                    RecipeId = recipe.Id,
-                };
-
-                return process;
-            }).ToList();
-
-            recipe.Processes = processes;
+            _context = context;
         }
 
-        await _context.Recipes.AddAsync(recipe);
-        await _context.SaveChangesAsync();
+        // ... [HttpPost], [HttpGet], [HttpPut], [HttpDelete]
 
-        return Created(nameof(Create), recipe);
-    }
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] RecipeDTO recipeDto)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _context.Users.Include(u => u.Recipes).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-    [HttpGet("{id}")]
-    [Authorize]
-    public IActionResult Get([FromRoute] int id)
-    {
-        var recipe = _context.Recipes
-            .Include(r => r.Ingredients)
-            .Include(r => r.Processes)
-            .FirstOrDefault(r => r.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        if (recipe == null) return NotFound();
+            var recipe = await _context.Recipes.FindAsync(id);
 
-        return Ok(recipe);
-    }
+            if (recipe == null)
+            {
+                return NotFound();
+            }
 
-    [HttpPut("{id}")]
-    [Authorize]
-    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] RecipeDTO recipeDto)
-    {
-        var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
+            if (recipe.UserId != user.Id)
+            {
+                return Forbid(); // Usuario nao permitido para atualizar
+            }
 
-        if (recipe == null) return NotFound();
+            recipe.Name = recipeDto.Name;
+            recipe.Ingredients = recipeDto.Ingredients;
+            recipe.UpdatedAt = DateTime.Now;
 
-        recipe.Name = recipeDto.Name;
-        recipe.Ingredients = recipeDto.Ingredients;
-        recipe.UpdatedAt = DateTime.Now;
+            _context.Recipes.Update(recipe);
+            await _context.SaveChangesAsync();
 
-        _context.Recipes.Update(recipe);
-        await _context.SaveChangesAsync();
+            return Ok();
+        }
 
-        return Ok();
-    }
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _context.Users.Include(u => u.Recipes).FirstOrDefaultAsync(u => u.Email == userEmail);
 
-    [HttpDelete("{id}")]
-    [Authorize]
-    public async Task<IActionResult> Delete([FromRoute] int id)
-    {
-        var recipe = await _context.Recipes.FirstOrDefaultAsync(r => r.Id == id);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        if (recipe == null) return NotFound();
+            var recipe = await _context.Recipes.FindAsync(id);
 
-        _context.Recipes.Remove(recipe);
-        await _context.SaveChangesAsync();
+            if (recipe == null)
+            {
+                return NotFound();
+            }
 
-        return Ok();
+            if (recipe.UserId != user.Id)
+            {
+                return Forbid(); // Usuario nao esta permitido para deletar 
+            }
+
+            _context.Recipes.Remove(recipe);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }
