@@ -1,0 +1,75 @@
+<div
+  class="w-full h-screen flex flex-col justify-center items-center bg-zinc-900"
+>
+  <h1 class="text-lg text-zinc-50">Faça seu registro</h1>
+  <form
+    class="flex flex-col mt-4 text-zinc-200 bg-zinc-800 py-6 px-10 rounded-md w-96"
+  >
+    <div class="flex flex-col gap-2">
+      <label>Nome de usuário</label>
+      <input
+        type="text"
+        name="username"
+        [(ngModel)]="username"
+        placeholder="Insira seu email"
+        class="bg-zinc-700 p-2 rounded-md border-2 border-zinc-600"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2 mt-2">
+      <label>E-mail</label>
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        placeholder="Insira sua senha"
+        class="bg-zinc-700 p-2 rounded-md border-2 border-zinc-600"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2 mt-2">
+      <label>Biografia</label>
+      <textarea
+        type="text"
+        name="biography"
+        [(ngModel)]="biography"
+        placeholder="Insira um resumo sobre você"
+        class="bg-zinc-700 p-2 h-24 rounded-md border-2 border-zinc-600"
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col gap-2 mt-2">
+      <label>Senha</label>
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        placeholder="Insira sua senha"
+        class="bg-zinc-700 p-2 rounded-md border-2 border-zinc-600"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2 mt-2">
+      <label>Confirme sua senha</label>
+      <input
+        type="password"
+        name="password2"
+        [(ngModel)]="password2"
+        placeholder="Insira sua senha"
+        class="bg-zinc-700 p-2 rounded-md border-2 border-zinc-600"
+      />
+    </div>
+
+    <button
+      class="rounded-md bg-sky-700 px-10 py-2 mt-6 justify-self-end self hover:bg-sky-600 w-min self-center"
+      (click)="register()"
+    >
+      Registrar
+    </button>
+    <a
+      [routerLink]="['/login']"
+      class="self-center mt-2 text-sm underline hover:text-sky-500"
+      >Login</a
+    >
+  </form>
+</div>

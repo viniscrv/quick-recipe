@@ -39,5 +39,6 @@
     <ItemGroup>
       <None Remove="Repositories\**" />
       <None Remove="Utils\**" />
+      <None Remove="database.db" />
     </ItemGroup>
 </Project>

@@ -1,0 +1,42 @@
+<div
+  class="w-full h-screen flex flex-col justify-center items-center bg-zinc-900"
+>
+  <h1 class="text-lg text-zinc-50">Faça seu login</h1>
+  <form
+    class="flex flex-col mt-4 text-zinc-50 bg-zinc-800 py-6 px-10 rounded-md w-96"
+  >
+    <div class="flex flex-col gap-2">
+      <label>E-mail</label>
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        placeholder="Insira seu email"
+        class="bg-zinc-700 p-2 rounded-md border-2 border-zinc-600"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2 mt-2">
+      <label>Senha</label>
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        placeholder="Insira sua senha"
+        class="bg-zinc-700 p-2 rounded-md border-2 border-zinc-600"
+      />
+    </div>
+
+    <button
+      (click)="login()"
+      class="rounded-md bg-sky-700 px-10 py-2 mt-6 justify-self-end self hover:bg-sky-600 w-min self-center"
+    >
+      Entrar
+    </button>
+    <a
+      [routerLink]="['/register']"
+      class="self-center mt-2 text-sm underline hover:text-sky-500"
+      >Registrar-se</a
+    >
+  </form>
+</div>
